@@ -1,4 +1,4 @@
-# Frontend Project
+# Book management Frontend
 
 This is a Next.js 15 project with Tailwind CSS and TypeScript.
 
