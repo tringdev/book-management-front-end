@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Book management Frontend
+
+This is a Next.js 15 project with Tailwind CSS and TypeScript.
 
 ## Getting Started
 
