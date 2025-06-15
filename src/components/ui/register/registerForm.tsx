@@ -2,41 +2,43 @@
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { loginSchema } from "@/lib/validate/validateForm";
+import { registerSchema } from "@/lib/validate/validateForm";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { login } from "@/services/auth";
-import { LoginResponse } from "@/types/auth";
+import { registerUser } from "@/services/auth";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { showSuccessToast, showErrorToast } from "@/lib/utils/toastUtils";
 import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { RegisterPayload } from "@/types/auth";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; 
 
-export default function LoginForm() {
+export default function RegisterForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false); 
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(loginSchema),
+    resolver: yupResolver(registerSchema),
   });
 
-  const onSubmit = async (data: { email: string; password: string }) => {
+  const onSubmit = async (data: RegisterPayload) => {
     setLoading(true);
     try {
-      const result: LoginResponse = await login(data);
-      Cookies.set("auth_token", result.data.accessToken, { expires: 7, secure: true, sameSite: "strict" }); // Expires in 7 days
-      showSuccessToast("Login successful!");
+      await registerUser(data);
+      showSuccessToast("Registration successful!");
       setTimeout(() => {
-        router.push("/dashboard");
-      }, 1000); 
+        router.push("/login");
+      }, 500);
     } catch (err: any) {
-      console.error("Login error:", err);
-      const errorMessage = err?.response?.data?.message || err.message || "Login failed. Please try again.";
+      console.error("Registration error:", err);
+      const errorMessage =
+        err?.response?.data?.message ||
+        err.message ||
+        "Registration failed. Please try again.";
       showErrorToast(errorMessage);
     } finally {
       setLoading(false);
@@ -51,7 +53,7 @@ export default function LoginForm() {
         className="space-y-4 max-w-sm mx-auto mt-10"
       >
         <h2 className="text-3xl font-bold text-center mb-6">
-          Welcome to the book management system!
+          Create a new account
         </h2>
         <div>
           <input
@@ -81,19 +83,36 @@ export default function LoginForm() {
             <p className="text-red-500">{errors.password.message}</p>
           )}
         </div>
+        <div className="relative">
+          <input
+            className="w-full px-4 py-2 border rounded"
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Confirm Password"
+            {...register("confirmPassword")}
+          />
+          <span
+            className="absolute right-3 top-3 cursor-pointer text-gray-500"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+          {errors.confirmPassword && (
+            <p className="text-red-500">{errors.confirmPassword.message}</p>
+          )}
+        </div>
         <button
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
           type="submit"
           disabled={loading}
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Registering..." : "Register"}
         </button>
         <button
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+          className="w-full bg-gray-600 text-white py-2 rounded hover:bg-gray-700"
           type="button"
-          onClick={() => router.push("/register")}
+          onClick={() => router.push("/login")}
         >
-          Register
+          Back to Login
         </button>
       </form>
     </>
