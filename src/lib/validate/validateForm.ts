@@ -13,7 +13,13 @@ export const loginSchema = yup.object().shape({
     .matches(/\d/, "Password must contain at least one number.")
     .matches(
       /[@$!%*?&]/,
-      "Password must contain at least one special character."
+      "Password must contain at least one special character.",
     )
     .required("Password is required."),
+});
+export const registerSchema = loginSchema.shape({
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords must match")
+    .required("Confirm Password is required"),
 });
