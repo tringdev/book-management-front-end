@@ -1,16 +1,31 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+import axios from "axios";
+import Cookies from "js-cookie";
 
-if (!API_URL) throw new Error("Missing NEXT_PUBLIC_API_URL environment variable");
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
-export async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
+if (!API_URL)
+  throw new Error("Missing NEXT_PUBLIC_API_URL environment variable");
+
+export async function apiFetch<T>(endpoint: string, options?: any): Promise<T> {
   const url = `${API_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
-  const res = await fetch(url, {
-    ...options,
+  const axiosInstance = axios.create({
+    baseURL: API_URL.replace(/\/$/, ""), // Đặt base URL
     headers: {
       "Content-Type": "application/json",
-      ...(options?.headers || {}),
+      Authorization: `Bearer ${Cookies.get("auth_token") || ""}`, // Thêm token từ cookie
     },
   });
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+  try {
+    const response = await axiosInstance({
+      url: url,
+      ...options,
+    });
+    return response.data as T; // Trả về dữ liệu từ response
+  } catch (error: any) {
+    if (error.response) {
+      // Xử lý lỗi từ server
+      throw new Error(error.response.data || error.response.statusText);
+    }
+    throw new Error(error.message || "An unknown error occurred");
+  }
 }
