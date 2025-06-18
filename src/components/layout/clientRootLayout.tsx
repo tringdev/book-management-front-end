@@ -2,8 +2,8 @@
 'use client';
 
 import '@/app/globals.css';
-import Sidebar from '@/components/ui/sidebar/sidebar';
-import Header from '@/components/ui/header/header'; // Đảm bảo import Header
+import Sidebar from '@/components/sidebar';
+import Header from '@/components/header';
 import { usePathname } from 'next/navigation';
 
 export default function ClientRootLayout({
