@@ -1,14 +1,9 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import menuItems from "@/constants/routes";
 
 export default function Sidebar() {
-  const menuItems = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Books", path: "/books" },
-    { name: "Authors", path: "/authors" },
-    { name: "User", path: "/user" },
-  ];
 
   const pathname = usePathname(); 
 
