@@ -3,51 +3,51 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
-import { fetchBookById, updateBook } from "@/services/book";
-import { Book } from "@/types/book";
+import { fetchAuthorById, updateAuthor } from "@/services/author";
+import { Author } from "@/types/author";
 import { useLoading } from "@/components/loading";
 import { showSuccessToast, showErrorToast } from "@/lib/utils/toastUtils";
 
-export default function BookDetailPage() {
+export default function AuthorDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [book, setBook] = useState<Book | null>(null);
+  const [author, setAuthor] = useState<Author | null>(null);
   const { isLoading, setLoading } = useLoading();
 
   useEffect(() => {
     if (!id || typeof id !== "string") return;
     setLoading(true);
-    const loadBook = async () => {
+    const loadAuthor = async () => {
       try {
-        const result = await fetchBookById(id);
-        setBook(result.data);
+        const result = await fetchAuthorById(id);
+        setAuthor(result.data);
       } catch (error) {
-        console.error("Error loading book:", error);
+        console.error("Error loading author: ", error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadBook();
+    loadAuthor();
   }, [id]);
 
   const handleUpdate = async () => {
-    if (typeof id === "string" && book) {
+    if (typeof id === "string" && author) {
       try {
-        await updateBook(id, book);
-        showSuccessToast("Book updated successfully!");
-        router.push("/books");
-      } catch (error: any) {
-        console.error("Error updating book:", error);
-        showErrorToast("Failed to update book. ", error.message);
+        await updateAuthor(id, author);
+        showSuccessToast("Author updated successfully!");
+        router.push("/authors");
+      } catch (error :any) {
+        console.log("Error updating author:", error);
+        showErrorToast("Error updating author: " + error.message || "Failed to update author.");
       }
     }
   };
 
-  if (!book) {
+  if (!author) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        Book not found.
+        Author not found.
       </div>
     );
   }
@@ -55,14 +55,14 @@ export default function BookDetailPage() {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <button
-        onClick={() => router.push("/books")}
+        onClick={() => router.push("/authors")}
         className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition"
       >
         Back
       </button>
       <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Edit Book</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Edit Author</h1>
         </div>
         <form
           onSubmit={(e) => {
@@ -73,36 +73,24 @@ export default function BookDetailPage() {
         >
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Title
+              Name
             </label>
             <input
               type="text"
-              value={book.title}
-              onChange={(e) => setBook({ ...book, title: e.target.value })}
+              value={author.name}
+              onChange={(e) => setAuthor({ ...author, name: e.target.value })}
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <textarea
-              value={book.description || ""}
-              onChange={(e) =>
-                setBook({ ...book, description: e.target.value })
-              }
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Published Year
+              Age
             </label>
             <input
               type="number"
-              value={book.publishedYear}
+              value={author.age}
               onChange={(e) =>
-                setBook({ ...book, publishedYear: Number(e.target.value) })
+                setAuthor({ ...author, age: Number(e.target.value) })
               }
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

@@ -17,9 +17,22 @@ export const loginSchema = yup.object().shape({
     )
     .required("Password is required."),
 });
+
 export const registerSchema = loginSchema.shape({
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password")], "Passwords must match")
     .required("Confirm Password is required"),
+});
+
+export const authorSchema = yup.object().shape({
+  name: yup
+    .string()
+    .trim()
+    .required("Name is required."),
+  age: yup
+    .number()
+    .min(1, "Age must be greater than or equal to 1.")
+    .max(120, "Age must be less than or equal to 120.")
+    .typeError("Age must be a number."),
 });

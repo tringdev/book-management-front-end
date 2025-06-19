@@ -5,15 +5,16 @@ import { fetchBooks } from "@/services/book";
 import { Book } from "@/types/book";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useRouter } from "next/navigation";
-import Loading from "@/components/loading";
+import { useLoading } from "@/components/loading";
 
 export default function BooksPage() {
   const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [booksPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const router = useRouter();
+  const { isLoading, setLoading } = useLoading();
+
 
   const loadBooks = async (page: number) => {
     setLoading(true);
@@ -50,10 +51,6 @@ export default function BooksPage() {
       loadBooks(prevPage); 
     }
   };
-
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
