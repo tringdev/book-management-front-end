@@ -9,10 +9,10 @@ if (!API_URL)
 export async function apiFetch<T>(endpoint: string, options?: any): Promise<T> {
   const url = `${API_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
   const axiosInstance = axios.create({
-    baseURL: API_URL.replace(/\/$/, ""), // Đặt base URL
+    baseURL: API_URL.replace(/\/$/, ""),
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${Cookies.get("auth_token") || ""}`, // Thêm token từ cookie
+      Authorization: `Bearer ${Cookies.get("auth_token") || ""}`,
     },
   });
   try {
@@ -20,12 +20,12 @@ export async function apiFetch<T>(endpoint: string, options?: any): Promise<T> {
       url: url,
       ...options,
     });
-    return response.data as T; // Trả về dữ liệu từ response
+    return response.data as T;
   } catch (error: any) {
-    if (error.response) {
-      // Xử lý lỗi từ server
-      throw new Error(error.response.data || error.response.statusText);
-    }
-    throw new Error(error.message || "An unknown error occurred");
+   throw {
+      message: error.response?.data?.message || error.message || "An unknown error occurred",
+      status: error.response?.status || 500,
+      data: error.response?.data || null,
+    };
   }
 }
