@@ -4,16 +4,27 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { fetchBookById, updateBook } from "@/services/book";
-import { Book } from "@/types/book";
+import { Book, BookUpdatePayload } from "@/types/book";
+import { Author } from "@/types/author"; 
+import { fetchAuthors } from "@/services/author";
 import { useLoading } from "@/components/loading";
 import { showSuccessToast, showErrorToast } from "@/lib/utils/toastUtils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function BookDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const [book, setBook] = useState<Book | null>(null);
-  const { isLoading, setLoading } = useLoading();
-
+  const [bookUpdate, setBookUpdate] = useState<BookUpdatePayload | null>(null);
+  const { setLoading } = useLoading();
+  const [authors, setAuthors] = useState<Author[]>([]);
+  
   useEffect(() => {
     if (!id || typeof id !== "string") return;
     setLoading(true);
@@ -21,6 +32,10 @@ export default function BookDetailPage() {
       try {
         const result = await fetchBookById(id);
         setBook(result.data);
+        setBookUpdate({
+          ...result.data,
+          authorId: result.data.authorId.id,
+        });
       } catch (error) {
         console.error("Error loading book:", error);
       } finally {
@@ -31,10 +46,24 @@ export default function BookDetailPage() {
     loadBook();
   }, [id]);
 
+  const loadAuthors = async () => {
+    try {
+      const result = await fetchAuthors({});
+      setAuthors(result.data || []);
+    } catch (error) {
+      console.error("Error loading authors:", error);
+    }
+  };
+
+  useEffect(() => {
+loadAuthors();
+  }, []);
+
   const handleUpdate = async () => {
-    if (typeof id === "string" && book) {
+    console.log("Updating book with:", bookUpdate);
+    if (typeof id === "string" && bookUpdate) {
       try {
-        await updateBook(id, book);
+        await updateBook(id, bookUpdate);
         showSuccessToast("Book updated successfully!");
         router.push("/books");
       } catch (error: any) {
@@ -77,8 +106,13 @@ export default function BookDetailPage() {
             </label>
             <input
               type="text"
-              value={book.title}
-              onChange={(e) => setBook({ ...book, title: e.target.value })}
+              value={bookUpdate?.title || ""}
+              onChange={(e) =>
+                setBookUpdate((prev) =>
+                  prev ? { ...prev, title: e.target.value } : null
+                )
+              }
+              placeholder="Enter book title"
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -87,12 +121,49 @@ export default function BookDetailPage() {
               Description
             </label>
             <textarea
-              value={book.description || ""}
+              value={bookUpdate?.description || ""}
               onChange={(e) =>
-                setBook({ ...book, description: e.target.value })
+                setBookUpdate((prev) =>
+                  prev ? { ...prev, description: e.target.value } : null
+                )
               }
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Author
+            </label>
+            <Select
+              value={book.authorId?.id || ""}
+              onValueChange={(value) => {
+                setBookUpdate((prev) =>
+                  prev
+                    ? {
+                        ...prev,
+                        authorId: value,
+                      }
+                    : null
+                );
+                setBook((prev) =>
+                  prev ? { ...prev, authorId: { id: value, name: "" } } : null
+                );
+              }}
+            >
+              <SelectTrigger className="w-full h-12 min-h-[48px] [&>span]:py-3">
+                <SelectValue
+                  className="text-black"
+                  placeholder={book.authorId.name}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {authors.map((author) => (
+                  <SelectItem key={author._id} value={author._id}>
+                    {author.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -102,8 +173,11 @@ export default function BookDetailPage() {
               type="number"
               value={book.publishedYear}
               onChange={(e) =>
-                setBook({ ...book, publishedYear: Number(e.target.value) })
+                setBookUpdate((prev) =>
+                  prev ? { ...prev, publishedYear: Number(e.target.value) } : null
+                )
               }
+              placeholder="Enter published year"
               className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>

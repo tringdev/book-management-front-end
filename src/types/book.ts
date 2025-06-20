@@ -38,10 +38,7 @@ export interface BookCreatePayload {
 export interface BookUpdatePayload {
   _id: string;
   title: string;
-  authorId: {
-    id: string;
-    name: string;
-  };
+  authorId: string;
   description?: string;
   publishedYear: number;
   userId: {

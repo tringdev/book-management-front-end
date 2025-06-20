@@ -36,3 +36,19 @@ export const authorSchema = yup.object().shape({
     .max(120, "Age must be less than or equal to 120.")
     .typeError("Age must be a number."),
 });
+
+export const bookSchema = yup.object().shape({
+  title: yup
+    .string()
+    .trim()
+    .required("Title is required."),
+  authorId: yup
+    .string()
+    .trim()
+    .required("Author is required."),
+  publishedYear: yup
+    .number()
+    .min(1, "Published year must be greater than or equal to 1.")
+    .required("Published year is required.")
+    .typeError("Published year must be a number."),
+});

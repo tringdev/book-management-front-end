@@ -1,4 +1,4 @@
-import { Book, BookResponse, BookDetailResponse, BookUpdatePayload } from "@/types/book";
+import { Book, BookResponse, BookDetailResponse, BookUpdatePayload, BookCreatePayload } from "@/types/book";
 import { apiFetch } from "@/lib/utils/api";
 
 export const fetchBooks = async (params: any): Promise<BookResponse> => {
@@ -21,5 +21,18 @@ return apiFetch<void>(`book/${id}`, {
     headers: {
       "Content-Type": "application/json",
     },
+  });
+};
+
+export const deleteBook = async (id: string): Promise<void> => {
+  return apiFetch<void>(`book/${id}`, {
+    method: "DELETE",
+  });
+};
+
+export const createBook = async (payload: BookCreatePayload): Promise<void> => {
+  return apiFetch<void>("book", {
+    method: "POST",
+    data: payload,
   });
 };
