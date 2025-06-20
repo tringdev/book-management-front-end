@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { showSuccessToast, showErrorToast } from "@/lib/utils/toastUtils";
 
+/**
+ * The AuthorsPage component displays a list of authors.
+ */
 export default function AuthorsPage() {
   const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,6 +20,11 @@ export default function AuthorsPage() {
   const [searchName, setSearchName] = useState("");
   const router = useRouter();
 
+  /**
+   * Loads authors from the API based on the given page and name filter.
+   * @param page The page number to fetch.
+   * @param nameFilter The name to filter authors by.
+   */
   const loadAuthors = async (page: number, nameFilter?: string) => {
     setLoading(true);
     try {
@@ -34,12 +42,16 @@ export default function AuthorsPage() {
     }
   };
 
+  /**
+   * Deletes an author from the API.
+   * @param id The ID of the author to delete.
+   */
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this author?")) return;
     try {
       await deleteAuthor(id);
       showSuccessToast("Author deleted successfully!");
-      loadAuthors(currentPage); 
+      loadAuthors(currentPage);
     } catch (error: any) {
       console.error("Error deleting author:", error);
       showErrorToast("Failed to delete author: " + (error.message || "Unknown error"));
@@ -67,6 +79,10 @@ export default function AuthorsPage() {
     loadAuthors(1, searchName);
   };
 
+  /**
+   * Renders the authors list page.
+   * @returns The JSX elements for the authors list page.
+   */
   if (authors.length === 0 && !filterVisible) {
     return (
       <div className="p-6 bg-gray-100 min-h-screen flex flex-col justify-center items-center">
@@ -85,6 +101,10 @@ export default function AuthorsPage() {
     );
   }
 
+  /**
+   * Renders the authors list page with filtering enabled.
+   * @returns The JSX elements for the authors list page with filtering enabled.
+   */
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-6">
@@ -113,7 +133,7 @@ export default function AuthorsPage() {
               onClick={() => setFilterVisible((prev) => !prev)}
               className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
             >
-             Filter
+              Filter
             </button>
             <button
               onClick={() => router.push("/authors/new")}
@@ -141,28 +161,30 @@ export default function AuthorsPage() {
                 </div>
               </td>
             </tr>
-  ) :             authors.map((author) => (
-              <tr key={author._id} className="hover:bg-gray-100 border-b">
-                <td className="p-4 text-gray-800">{author.name}</td>
-                <td className="p-4 text-gray-800">{author.age}</td>
-                <td className="p-4 text-gray-800">
-                  {new Date(author.createdAt).toLocaleDateString()}
-                </td>
-                <td className="p-4 text-center">
-                  <button
-                    className="text-blue-500 hover:text-blue-700 mr-2, cursor-pointer"
-                    onClick={() => router.push(`/authors/${author._id}`)}
-                  >
-                    <FaEdit />
-                  </button>
-                  <span className="mx-1"></span>
-                  <button className="text-red-500 hover:text-red-700, cursor-pointer"
-                    onClick={() => handleDelete(author._id)}
-                  > <FaTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
+            ) : (
+              authors.map((author) => (
+                <tr key={author._id} className="hover:bg-gray-100 border-b">
+                  <td className="p-4 text-gray-800">{author.name}</td>
+                  <td className="p-4 text-gray-800">{author.age}</td>
+                  <td className="p-4 text-gray-800">
+                    {new Date(author.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-4 text-center">
+                    <button
+                      className="text-blue-500 hover:text-blue-700 mr-2, cursor-pointer"
+                      onClick={() => router.push(`/authors/${author._id}`)}
+                    >
+                      <FaEdit />
+                    </button>
+                    <span className="mx-1"></span>
+                    <button className="text-red-500 hover:text-red-700, cursor-pointer"
+                      onClick={() => handleDelete(author._id)}
+                    > <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
         {/* Pagination Controls */}
@@ -197,3 +219,4 @@ export default function AuthorsPage() {
     </div>
   );
 }
+

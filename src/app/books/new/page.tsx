@@ -34,7 +34,7 @@ export default function CreateBookPage() {
   useEffect(() => {
     // Fetch and check authors based on the search query
     const fetchAndCheckAuthors = async () => {
-      const result = await fetchAuthors({ title: searchAuthor });
+      const result = await fetchAuthors({});
       if (result.data.length === 0) {
         if (
           confirm(
@@ -67,7 +67,7 @@ export default function CreateBookPage() {
     loadAuthors();
   }, [searchAuthor]);
 
-    const loadAuthors = async () => {
+  const loadAuthors = async () => {
     try {
       const result = await fetchAuthors({ name: searchAuthor });
       setAuthors(result.data || []);
@@ -77,7 +77,8 @@ export default function CreateBookPage() {
     }
   };
   const handleAuthorSelect = (author: any) => {
-    setSearchAuthor(author.name); 
+    setNewBook({ ...newBook, authorId: author._id || "" });
+    setSearchAuthor(author.name);
     setAuthors([]);
     setDropdownVisible(false);
   };
@@ -87,7 +88,6 @@ export default function CreateBookPage() {
    * @returns {Promise<boolean>} True if the form is valid, otherwise false.
    */
   const validateForm = async () => {
-    console.log("Author ID:", newBook);
     try {
       await bookSchema.validate(newBook, { abortEarly: false });
       setErrors({});
@@ -180,20 +180,20 @@ export default function CreateBookPage() {
               Author
             </label>
             <div className="relative">
-      <input
-        type="text"
-        value={searchAuthor}
-        onChange={(e) => {
-          setSearchAuthor(e.target.value);
-          if (e.target.value.trim() !== "") {
-            loadAuthors();
-          } else {
-            setAuthors([]);
-            setDropdownVisible(false);
-          }
-        }}
-        onFocus={() => setDropdownVisible(true)}
-        onBlur={() => setTimeout(() => setDropdownVisible(false), 200)}
+              <input
+                type="text"
+                value={searchAuthor}
+                onChange={(e) => {
+                  setSearchAuthor(e.target.value);
+                  if (e.target.value.trim() !== "") {
+                    loadAuthors();
+                  } else {
+                    setAuthors([]);
+                    setDropdownVisible(false);
+                  }
+                }}
+                onFocus={() => setDropdownVisible(true)}
+                onBlur={() => setTimeout(() => setDropdownVisible(false), 200)}
                 placeholder="Search author by name"
                 className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${
                   errors.authorId
