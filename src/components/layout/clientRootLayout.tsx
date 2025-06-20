@@ -30,7 +30,7 @@ export default function ClientRootLayout({
               <div className="flex flex-1">
                 <Sidebar />
                  <ToastContainer />
-                <div className="flex-1 p-6 mt-16 ml-64">{children}</div>
+                <div className="flex-1 mt-16 ml-64">{children}</div>
               </div>
             </div>
           )}
