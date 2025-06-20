@@ -46,9 +46,10 @@ export const bookSchema = yup.object().shape({
     .string()
     .trim()
     .required("Author is required."),
-  publishedYear: yup
-    .number()
-    .min(1, "Published year must be greater than or equal to 1.")
-    .required("Published year is required.")
-    .typeError("Published year must be a number."),
+publishedYear: yup
+  .number()
+  .min(1, "Published year must be greater than or equal to 1.")
+  .max(new Date().getFullYear(), "Published year must be less than or equal to the current year.")
+  .required("Published year is required.")
+  .typeError("Published year must be a number."),
 });
